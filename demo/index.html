@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>グラフシューター — 関数で、撃ち抜け。</title>
+  <meta name="description" content="関数のグラフを弾道にして星を撃ち抜く学習ゲーム。比例から三角関数まで、式とグラフの対応を体で覚える。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* 体験版：ステージ1のみ。遷移先の無いナビゲーションは隠す */
+    #btn-to-select, #btn-next { display: none; }
+    .demo-badge {
+      color: var(--magenta);
+      border: 1px solid rgba(255, 90, 209, 0.4);
+      border-radius: 8px;
+      padding: 0.1em 0.6em;
+      font-family: var(--font-display);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 音量コントロール（タイトル・ステージ選択のみで表示。プレイ中は常に非表示＝常に無音） -->
+  <div id="audio-control" class="audio-control">
+    <button id="btn-mute" class="btn btn-ghost btn-icon" aria-label="音の切り替え">🔊</button>
+    <input id="volume-slider" class="volume-slider" type="range" min="0" max="100" value="80" aria-label="音量">
+  </div>
+
+  <!-- タイトル -->
+  <section id="screen-title" class="screen" aria-labelledby="game-title">
+    <div class="title-inner">
+      <p class="title-kicker">FUNCTION GRAPH SHOOTING</p>
+      <h1 id="game-title" class="game-logo">グラフ<span class="logo-accent">シューター</span></h1>
+      <p class="title-tagline">関数で、撃ち抜け。</p>
+      <p class="title-desc">
+        座標平面に浮かぶ星を、キミの考えた <strong>y = f(x)</strong> のグラフで撃ち抜くパズルシューティング。<br>
+        小6の比例から高2の三角関数まで、「式とグラフ」を体で覚えよう。
+      </p>
+      <button id="btn-start" class="btn btn-primary btn-big">ゲームスタート</button>
+      <p class="title-credit">第7回 学力向上アプリコンテスト 応募プロトタイプ</p>
+    </div>
+    <div class="title-deco" aria-hidden="true">
+      <span class="deco-star s1">★</span><span class="deco-star s2">★</span>
+      <span class="deco-star s3">★</span><span class="deco-star s4">★</span>
+      <span class="deco-formula f1">y = ax + b</span>
+      <span class="deco-formula f2">y = sin x</span>
+      <span class="deco-formula f3">y = x²</span>
+    </div>
+  </section>
+
+  <!-- ステージ選択 -->
+  <section id="screen-select" class="screen" aria-labelledby="select-heading">
+    <header class="select-header">
+      <button id="btn-back-title" class="btn btn-ghost">← タイトル</button>
+      <h2 id="select-heading">ステージセレクト</h2>
+      <p class="select-sub">クリアすると次のステージが解放。PAR以内のクリアでランクS！</p>
+    </header>
+    <div id="level-list" class="level-list"></div>
+  </section>
+
+  <!-- プレイ -->
+  <section id="screen-play" class="screen" aria-labelledby="hud-title">
+    <header class="hud">
+      <button id="btn-back-select" class="btn btn-ghost" hidden>← ステージ</button>
+      <div class="hud-name">
+        <span id="hud-num" class="hud-num">01</span>
+        <div>
+          <h2 id="hud-title">タイトル</h2>
+          <span id="hud-group" class="hud-group">比例</span>
+        </div>
+      </div>
+      <div class="hud-stats">
+        <span class="hud-stat demo-badge">体験版</span>
+        <span id="hud-stars" class="hud-stat">⭐ 0 / 3</span>
+        <span id="hud-shots" class="hud-stat">🚀 0</span>
+        <span id="hud-par" class="hud-stat hud-par">PAR 1</span>
+      </div>
+    </header>
+
+    <p id="level-desc" class="level-desc"></p>
+
+    <div class="board-wrap">
+      <canvas id="board" width="1000" height="700" aria-label="座標平面。星と障害物が配置され、入力した関数のグラフが弾道として描かれる"></canvas>
+      <span id="no-preview-badge" class="no-preview" hidden>📡 ノーレーダー戦 — プレビューなし！</span>
+    </div>
+
+    <div class="controls">
+      <div class="expr-row">
+        <label for="expr" class="expr-label">y =</label>
+        <input id="expr" type="text" placeholder="例) 0.5x + 1" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <button id="btn-fire" class="btn btn-primary">発射 🚀</button>
+      </div>
+      <div class="chip-row" aria-label="入力補助">
+        <button class="chip" data-insert="x">x</button>
+        <button class="chip" data-insert="^2">²</button>
+        <button class="chip" data-insert="(">(</button>
+        <button class="chip" data-insert=")">)</button>
+        <button class="chip" data-insert="pi">π</button>
+        <button class="chip" data-insert="sin()">sin</button>
+        <button class="chip" data-insert="cos()">cos</button>
+        <button class="chip" data-insert="abs()">|x|</button>
+        <button class="chip" data-insert="sqrt()">√</button>
+        <button id="btn-hint" class="chip chip-hint">💡 ヒント</button>
+      </div>
+      <p id="expr-error" class="expr-error" role="alert"></p>
+      <div id="hint-body" class="hint-body" hidden>
+        <p id="hint-text"></p>
+        <button id="btn-answer" class="btn btn-ghost">答えの例を見る</button>
+        <p id="hint-answer" class="hint-answer" hidden></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- クリアモーダル -->
+  <dialog id="modal-clear" class="modal">
+    <p class="clear-label">STAGE CLEAR!</p>
+    <p id="clear-rank" class="clear-rank" data-rank="3">S</p>
+    <p id="clear-stars" class="clear-stars">★★★</p>
+    <p id="clear-shots" class="clear-shots"></p>
+    <div class="lesson">
+      <p class="lesson-label">📖 学びメモ</p>
+      <p id="clear-lesson"></p>
+    </div>
+    <p id="all-clear-msg" class="all-clear" hidden>🎉 全ステージクリア！ キミはもうグラフの狙撃手だ！</p>
+    <div class="modal-actions">
+      <button id="btn-retry" class="btn btn-ghost">もう一回</button>
+      <button id="btn-to-select" class="btn btn-ghost">ステージ選択</button>
+      <button id="btn-next" class="btn btn-primary">次のステージ →</button>
+    </div>
+  </dialog>
+
+  <script src="js/parser.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/graph.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
