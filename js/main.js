@@ -252,8 +252,8 @@
   // parser.js はテスト共用のため GSParser グローバル。エイリアスを張る
   GS.parser_compile = (src) => globalThis.GSParser.compile(src);
 
-  // editor.js から画面遷移とステージ開始を呼べるように最小 API を公開する
-  GS.mainApi = { show, startLevel };
+  // editor.js / autodemo.js から呼べるように最小 API を公開する
+  GS.mainApi = { show, startLevel, renderer };
 
   // ブラウザの自動再生制限でBGMが始まらなかった場合、最初の操作で再試行する
   const retryBgm = () => {
