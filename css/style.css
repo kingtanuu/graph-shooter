@@ -267,6 +267,82 @@ body::before {
 .level-stars { color: var(--muted); letter-spacing: 0.15em; }
 .level-stars.earned { color: var(--gold); text-shadow: 0 0 8px rgba(255, 209, 102, 0.5); }
 
+/* ---------- 自作ステージ（ステージ選択内） ---------- */
+/* custom セクションを下に並べるため、ステージ選択では一覧を伸縮させず画面側でスクロール */
+#screen-select .level-list { flex: 0 0 auto; overflow: visible; }
+
+.custom-section {
+  flex: 0 0 auto;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--panel-border);
+}
+.custom-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+.custom-head h3 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--gold);
+  text-shadow: 0 0 10px rgba(255, 209, 102, 0.4);
+}
+.btn-new { font-size: 0.9rem; padding: 0.45em 1em; }
+.custom-empty { color: var(--muted); font-size: 0.88rem; padding: 0.25rem 0 0.75rem; }
+
+.custom-card .level-num { color: var(--gold); text-shadow: 0 0 10px rgba(255, 209, 102, 0.5); }
+/* 遊ぶ/編集/削除 はカード幅いっぱいに均等配置した揃った行にする */
+.custom-actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--panel-border);
+}
+.custom-btn {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 0.4em 0;
+  cursor: pointer;
+  transition: border-color var(--duration-fast), transform var(--duration-fast);
+}
+.custom-btn:hover { border-color: var(--cyan); transform: translateY(-1px); }
+.custom-btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.custom-btn-del { color: var(--danger); border-color: rgba(255, 90, 106, 0.35); }
+.custom-btn-del:hover { border-color: var(--danger); }
+
+/* ---------- エディタ ---------- */
+.editor-name-label {
+  font-family: var(--font-body);
+  font-weight: 700;
+  color: var(--cyan);
+  white-space: nowrap;
+}
+.hud-par input {
+  width: 2.6em;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--gold);
+  background: rgba(5, 9, 20, 0.8);
+  border: 1px solid rgba(255, 209, 102, 0.4);
+  border-radius: 6px;
+  padding: 0.05em 0.3em;
+  text-align: center;
+  margin-left: 0.3em;
+}
+.editor-msg { color: var(--gold); font-size: 0.85rem; font-weight: 700; align-self: center; }
+
 /* ---------- プレイ ---------- */
 #screen-play { gap: 0.5rem; }
 
