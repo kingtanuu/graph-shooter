@@ -50,6 +50,20 @@
       shake = 0;
     }
 
+    // 画面上のクリック座標をワールド座標へ逆変換する（object-fit: contain のレターボックスを考慮）
+    function toWorld(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      const scale = Math.min(rect.width / W, rect.height / H);
+      const offX = (rect.width - W * scale) / 2;
+      const offY = (rect.height - H * scale) / 2;
+      const cx = (clientX - rect.left - offX) / scale;
+      const cy = (clientY - rect.top - offY) / scale;
+      return {
+        x: xMin + (cx / W) * (xMax - xMin),
+        y: yMin + ((H - cy) / H) * (yMax - yMin),
+      };
+    }
+
     function setGhost(points) {
       ghost = points;
     }
@@ -292,6 +306,7 @@
       setLevel,
       setGhost,
       fire,
+      toWorld,
       get busy() { return !!shot && !shot.done; },
     };
   }

@@ -48,6 +48,15 @@
       <p class="select-sub">クリアすると次のステージが解放。PAR以内のクリアでランクS！</p>
     </header>
     <div id="level-list" class="level-list"></div>
+
+    <section id="custom-section" class="custom-section" aria-labelledby="custom-heading">
+      <div class="custom-head">
+        <h3 id="custom-heading">✏️ 自分で作ったステージ</h3>
+        <button id="btn-new-stage" class="btn btn-primary btn-new">＋ 新しく作る</button>
+      </div>
+      <p class="custom-empty">まだありません。「＋ 新しく作る」でオリジナル問題を作ってみよう！</p>
+      <div id="custom-list" class="level-list custom-list"></div>
+    </section>
   </section>
 
   <!-- プレイ -->
@@ -102,6 +111,43 @@
     </div>
   </section>
 
+  <!-- ステージエディタ -->
+  <section id="screen-editor" class="screen" aria-labelledby="editor-heading">
+    <header class="hud">
+      <button id="btn-editor-back" class="btn btn-ghost">← ステージ</button>
+      <div class="hud-name">
+        <span class="hud-num">✏️</span>
+        <div>
+          <h2 id="editor-heading">ステージエディタ</h2>
+          <span class="hud-group">盤面をタップして星を置こう</span>
+        </div>
+      </div>
+      <div class="hud-stats">
+        <span id="editor-count" class="hud-stat">⭐ 0</span>
+        <label class="hud-stat hud-par">PAR <input id="editor-par" type="number" min="1" max="5" value="1" inputmode="numeric"></label>
+        <button id="btn-editor-test" class="btn btn-primary">▶ ためす</button>
+      </div>
+    </header>
+
+    <p class="level-desc">盤面をタップで星を配置、もう一度タップで削除。星をつなぐ関数を考えて遊ぶオリジナル問題が作れるよ。</p>
+
+    <div class="board-wrap">
+      <canvas id="editor-board" width="1000" height="700" aria-label="ステージ編集用の座標平面。タップで星を配置する"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="expr-row">
+        <label for="editor-name" class="editor-name-label">名前</label>
+        <input id="editor-name" type="text" placeholder="例）わたしの一次関数" maxlength="20" autocomplete="off">
+        <button id="btn-editor-save" class="btn btn-primary">保存 💾</button>
+      </div>
+      <div class="chip-row">
+        <button id="btn-editor-clear" class="chip">🗑 全部消す</button>
+        <span id="editor-msg" class="editor-msg" role="status"></span>
+      </div>
+    </div>
+  </section>
+
   <!-- クリアモーダル -->
   <dialog id="modal-clear" class="modal">
     <p class="clear-label">STAGE CLEAR!</p>
@@ -126,5 +172,6 @@
   <script src="js/game.js"></script>
   <script src="js/graph.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/editor.js"></script>
 </body>
 </html>

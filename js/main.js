@@ -9,6 +9,7 @@
     title: $('#screen-title'),
     select: $('#screen-select'),
     play: $('#screen-play'),
+    editor: $('#screen-editor'),
   };
   const audioControl = $('#audio-control');
 
@@ -56,6 +57,7 @@
       });
       list.appendChild(btn);
     });
+    if (GS.editor) GS.editor.renderList();
   }
 
   // ---------- プレイ ----------
@@ -65,7 +67,7 @@
     shots = 0;
     cleared = false;
     renderer.setLevel(lv, collected);
-    $('#hud-num').textContent = String(lv.id).padStart(2, '0');
+    $('#hud-num').textContent = lv.custom ? '✏' : String(lv.id).padStart(2, '0');
     $('#hud-title').textContent = lv.title;
     $('#hud-group').textContent = `${lv.group}・${lv.grade}`;
     $('#hud-par').textContent = `PAR ${lv.par}`;
@@ -146,15 +148,17 @@
   function onClear() {
     GS.sound.clear();
     const stars = GS.game.rank(shots, level.par);
-    progress = GS.game.saveProgress(progress, level.id, stars);
+    // 自作ステージのテストプレイは通常の進捗（gs-progress）を汚さない
+    if (!level.custom) progress = GS.game.saveProgress(progress, level.id, stars);
     $('#clear-rank').textContent = stars === 3 ? 'S' : stars === 2 ? 'A' : 'B';
     $('#clear-rank').dataset.rank = String(stars);
     $('#clear-stars').textContent = starsText(stars);
     $('#clear-shots').textContent = `発射 ${shots} 回（PAR ${level.par}）`;
     $('#clear-lesson').textContent = level.lesson;
     const isLast = level.id >= GS.LEVELS.length;
-    $('#btn-next').hidden = isLast;
-    $('#all-clear-msg').hidden = !isLast;
+    // 自作ステージには「次のステージ」も「全クリア」も無い
+    $('#btn-next').hidden = level.custom || isLast;
+    $('#all-clear-msg').hidden = level.custom || !isLast;
     $('#modal-clear').showModal();
   }
 
@@ -199,6 +203,11 @@
   });
   $('#btn-back-title').addEventListener('click', () => show('title'));
   $('#btn-back-select').addEventListener('click', () => {
+    // 自作ステージのテストプレイ中は、編集内容を保ったままエディタへ戻す
+    if (level && level.custom && GS.editor) {
+      GS.editor.reopen();
+      return;
+    }
     renderSelect();
     show('select');
   });
@@ -214,6 +223,10 @@
   });
   $('#btn-to-select').addEventListener('click', () => {
     $('#modal-clear').close();
+    if (level && level.custom && GS.editor) {
+      GS.editor.reopen();
+      return;
+    }
     renderSelect();
     show('select');
   });
@@ -238,6 +251,9 @@
 
   // parser.js はテスト共用のため GSParser グローバル。エイリアスを張る
   GS.parser_compile = (src) => globalThis.GSParser.compile(src);
+
+  // editor.js から画面遷移とステージ開始を呼べるように最小 API を公開する
+  GS.mainApi = { show, startLevel };
 
   // ブラウザの自動再生制限でBGMが始まらなかった場合、最初の操作で再試行する
   const retryBgm = () => {
