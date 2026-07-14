@@ -8,7 +8,7 @@
   const GS = globalThis.GS;
   const $ = (sel) => document.querySelector(sel);
   const STORAGE_KEY = 'gs-custom-stages';
-  const MAX_STARS = 3;
+  const MAX_STARS = 30; // 実質無制限（安全のための上限）
   const MIN_STARS = 2;
 
   const [X0, X1] = GS.RANGE.x;
@@ -184,13 +184,11 @@
     list.forEach((rec) => {
       const card = document.createElement('div');
       card.className = 'level-card custom-card';
-      const starCount = Math.min(rec.stars.length, MAX_STARS);
-      const stars = '★'.repeat(starCount) + '☆'.repeat(MAX_STARS - starCount);
       card.innerHTML = `
         <span class="level-num">✏</span>
         <span class="level-tags"><span class="tag">自作</span><span class="tag tag-grade">PAR ${rec.par}</span></span>
         <span class="level-title">${escapeHtml(rec.name)}</span>
-        <span class="level-stars earned">${stars}</span>
+        <span class="level-stars earned">⭐ ${rec.stars.length}</span>
         <span class="custom-actions">
           <button class="custom-btn" data-act="play" data-id="${rec.id}">遊ぶ</button>
           <button class="custom-btn" data-act="edit" data-id="${rec.id}">編集</button>
