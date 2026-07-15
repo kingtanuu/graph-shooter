@@ -93,14 +93,9 @@
     return next;
   }
 
-  /** クリア済み数+1 までのステージが遊べる */
-  function unlockedCount(progress) {
-    let n = 0;
-    for (const lv of GS.LEVELS) {
-      if (progress[lv.id] > 0) n++;
-      else break;
-    }
-    return Math.min(n + 1, GS.LEVELS.length);
+  /** 最初から全ステージ解放（progress は星ランク表示にのみ使う） */
+  function unlockedCount() {
+    return GS.LEVELS.length;
   }
 
   GS.game = { simulate, trace, rank, loadProgress, saveProgress, unlockedCount };
